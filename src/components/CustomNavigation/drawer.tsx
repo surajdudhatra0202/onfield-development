@@ -124,17 +124,15 @@ const CustomDrawer = (props) => {
         />
         <View style={styles.drawerBelowLogo} />
 
-
-          <FlatList
-            style={c.flex1}
-            data={drawerList}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={ListHeaderComponent}
-            nestedScrollEnabled
-          />
-
+        <FlatList
+          style={c.flex1}
+          data={drawerList}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={ListHeaderComponent}
+          scrollEnabled={false}
+        />
       </DrawerContentScrollView>
 
       {ListHeaderComponent()}
