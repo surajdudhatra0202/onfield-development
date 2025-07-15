@@ -1,0 +1,6 @@
+# .eslintignore
+
+ios/Pods/
+android/
+node_modules/
+build/

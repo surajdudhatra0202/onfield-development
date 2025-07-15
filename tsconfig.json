@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@components": ["components/index.ts"],
+      "@screens/*": ["screens/*"],
+      "@utils": ["utils"],
+      "@services": ["services/api.service.ts"],
+      "@types/*": ["types/*"],
+      "@hooks": ["hook/index.ts"],
+      "@navigation/*": ["navigation/*"],
+      "@constants": ["constants"],
+      "@style": ["style/index.ts"]
+    }
+  },
+  "extends": "@react-native/typescript-config/tsconfig.json"
+}

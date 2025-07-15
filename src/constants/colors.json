@@ -1,0 +1,43 @@
+{
+  "white": "#fff",
+  "black": "#000",
+  "grey": "#e1e1e1",
+  "secondary": "#FAB729",
+  "lightBlack": "rgba(0, 0, 0, 0.46)",
+
+  "primary": "#21376d",
+  "primaryDark": "#003153",
+  "skyColor": "#CFDCFF80",
+  "accent": "#00AAB4",
+  "drawerColor": "#22376E",
+  "light": "#F3F3F3",
+  "transparentWhite": "#FFFFFF0D",
+
+  "green": "#25ae08",
+  "red": "#d41c1c",
+  "darkGrey": "#888a8c",
+  "orange": "#B0E0E6",
+  "colorPrimaryTransparent": "rgba(54, 0, 154, 250)",
+  "unSelectedIndicatorColor": "#BCBCBC",
+  "mediumGrey": "#c4c5c7",
+  "transparent": "transparent",
+  "light_gray": "rgba(125, 125, 130, 0.1)",
+  "lightWhite": "#F5F5F5",
+
+  "chatBg": "#EEF2F6",
+  "chatLeft": "#E3EAF2",
+  "chatRight": "#D4E4FC",
+  "labelColor": "#343434",
+
+  "drawerButtonColor": "#EDEDED33",
+  "whiteRGB30": "rgba(255,255,255,0.8)",
+  "very_light_gray": "rgba(237, 237, 237, 0.10)",
+  "royal_blue": "rgba(65, 105, 225,0.4)",
+  "vibrant_blue": "#4285F4",
+  "granite_gray": "#616161",
+  "light_pastel_blue": "#DFE8FF",
+  "light_gray2": "#ddd",
+  "medium_light_gray": "#BABABA",
+  "deep_blue": "#014f86",
+  "button_blue": "#DEE8F8"
+}

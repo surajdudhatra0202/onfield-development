@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-app-intro-slider/dist/index.js b/node_modules/react-native-app-intro-slider/dist/index.js
+index 0935c97..6b5228a 100644
+--- a/node_modules/react-native-app-intro-slider/dist/index.js
++++ b/node_modules/react-native-app-intro-slider/dist/index.js
+@@ -106,8 +106,6 @@ class AppIntroSlider extends React.Component {
+                         : this.props.dotStyle,
+                 ]}/>))}
+           </react_native_1.View>
+-          {primaryButton}
+-          {secondaryButton}
+         </react_native_1.SafeAreaView>
+       </react_native_1.View>);
+         };
