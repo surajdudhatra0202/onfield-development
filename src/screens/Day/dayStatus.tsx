@@ -1,4 +1,4 @@
-import { View, Text as T, Animated, Easing, ImageBackground } from 'react-native';
+import { View, Text as T, Animated, Easing, ImageBackground, Alert } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Header, Text } from '@components';
 import c from '@style';
@@ -45,7 +45,7 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
     fetchAndStoreLocation('useEffect');
   }, []);
 
-  const onNext = async (flag:string,lat: string,long: string): Promise<void> => {
+  const startDay = async (flag: string, lat: string, long: string) => {
     try {
       if (lat.length === 0 || long.length === 0) {
         setLoading(true)
@@ -82,6 +82,26 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
     }
   }
 
+  const onNext = async (flag: string, lat: string, long: string): Promise<void> => {
+
+    Alert.alert(
+      'Start your day',
+      'Are you wnat to start your day ?',
+      [
+        {
+          text: 'No',
+          onPress: () => console.log("No pressed"),
+          // style: 'cancle',
+        },
+        {
+          text: 'Yes',
+          onPress: () => startDay(flag, lat, long)
+        } 
+      ],
+      { cancelable: true }
+    )
+  }
+
   // For Animated Image Circle
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -103,7 +123,7 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
   const openDrawer = () => navigation.openDrawer();
   // console.log("day");
-  
+
 
   return (
     <View style={c.flex1}>
@@ -156,18 +176,18 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
             />
           </T>
 
-            <Button
-              top={40}
-              loading={loading}
-              onPress={()=>{
-                onNext('',lat,long)
-              }}
-              textColor={Colors.white}
-              style={styles.buttonStylePayment}
-              text={'Start day'}
-              icon={type !== 'start' ? 'power' : 'arrow-right'}
-              bgColor={type !== 'start' ? Colors.primary : Colors.primary}
-            />
+          <Button
+            top={40}
+            loading={loading}
+            onPress={() => {
+              onNext('', lat, long)
+            }}
+            textColor={Colors.white}
+            style={styles.buttonStylePayment}
+            text={'Start day'}
+            icon={type !== 'start' ? 'power' : 'arrow-right'}
+            bgColor={type !== 'start' ? Colors.primary : Colors.primary}
+          />
         </View>
       </ImageBackground>
     </View>

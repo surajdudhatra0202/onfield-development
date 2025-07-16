@@ -29,7 +29,14 @@ const CustomDrawer = (props) => {
   const [activeMenu, setActiveMenu] = useState(0);
   const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
 
+  console.log('props', props);
+  console.log('drawerlist', ...getLoginDetails().drawerMenu);
+  
+
   const menuAction = (item: menuActionProps, index: number) => {
+    console.log(Strings.endMyDay);
+    console.log(item.nav);
+    
     if (item.nav === 'delete') {
       Alert.alert(
         'Delete Account',
@@ -47,12 +54,22 @@ const CustomDrawer = (props) => {
         ],
         { cancelable: true },
       );
-    } else if (item.nav === Strings.endMyDay) {
+    }
+    // else if (item.nav === Strings.endMyDay) {
+    //   props.navigation.navigate(Routes.DayStatus, { data: item });
+    //   console.log(Routes.DayStatus, {data : item})
+
+    else if (item.nav === "DayStatus") {
       props.navigation.navigate(Routes.DayStatus, { data: item });
+      console.log('find status', props.navigation.navigate);
+      console.log('routes status', Routes.DayStatus, {data : item})
+
     } else if (item.nav === Strings.logout) {
       isLogout();
     } else {
       props.navigation.navigate(item.nav);
+      // console.log('navi', props.navigation.navigate);
+      // console.log('routes', Routes.DayStatus, {data : item})
     }
     setActiveMenu(index);
   };

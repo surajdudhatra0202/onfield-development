@@ -1,6 +1,6 @@
 import { showMessage } from 'react-native-flash-message';
 import { Colors, StorageKey, Strings } from '@constants';
-import { Platform, StatusBar } from 'react-native';
+import { Alert, Platform, StatusBar } from 'react-native';
 import type { GeoCoordinates, GeoPosition } from 'react-native-geolocation-service';
 import Geolocation from 'react-native-geolocation-service';
 import { realm } from '../database';
@@ -182,16 +182,45 @@ export function deleteDBData() {
 }
 
 
-
 export const isLogout = () => {
-  deleteDBData();
-  navigationRef.reset({
-    index: 0,
-    routes: [
+  Alert.alert(
+    "Confirm Logout",
+    "Are you sure ?",
+    [
       {
-        name: Routes.Login,
-        params: { status: 'start' },
+        text: "No",
+        onPress: () => console.log('No Pressed'),
+        style: 'cancel',
       },
+      {
+        text: "Yes",
+        onPress: () => {
+          deleteDBData();
+          navigationRef.reset({
+            index: 0,
+            routes: [
+              {
+                name: Routes.Login,
+                params: { status: 'start' },
+              },
+            ],
+          });
+        }
+      }
     ],
-  });
+    { cancelable: true }
+  )
 };
+
+// export const isLogout = () => {
+//   deleteDBData();
+//   navigationRef.reset({
+//     index: 0,
+//     routes: [
+//       {
+//         name: Routes.Login,
+//         params: { status: 'start' },
+//       },
+//     ],
+//   });
+// };
