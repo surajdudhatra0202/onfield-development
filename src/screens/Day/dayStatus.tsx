@@ -9,15 +9,17 @@ import { getLocation, showPopupMessage, END_DAY, START_DAY, PrefManager } from '
 import { Post } from '@services';
 import { NavigationProps } from '@/navigation/navigation';
 import { ApiResponse, AuthData } from '@/types/global';
+import ConfirmationModal from '@/components/Modal/confirmationModal';
 
 const cTime = moment(new Date()).format('hh:mm');
 
 const EndMyDay = ({ navigation, route }: NavigationProps) => {
-  const type = route?.params?.status
-  const [lat, setLat] = useState('')
-  const [long, setLong] = useState('')
-  const [currentTime, setCurrentTime] = useState(cTime)
-  const [loading, setLoading] = useState(false)
+  const type = route?.params?.status;
+  const [lat, setLat] = useState('');
+  const [long, setLong] = useState('');
+  const [currentTime, setCurrentTime] = useState(cTime);
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchAndStoreLocation = async (from: string) => {
     const coords = await getLocation();
@@ -34,12 +36,12 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTime(moment(new Date()).format('hh:mm'))
+      setCurrentTime(moment(new Date()).format('hh:mm'));
     }, 30000);
     return () => {
-      clearInterval(intervalId)
-    }
-  }, [])
+      clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     fetchAndStoreLocation('useEffect');
@@ -48,25 +50,20 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   const startDay = async (flag: string, lat: string, long: string) => {
     try {
       if (lat.length === 0 || long.length === 0) {
-        setLoading(true)
+        setLoading(true);
         if (flag !== 'stop') {
           await fetchAndStoreLocation('toLogin');
         }
-        setLoading(false)
+        setLoading(false);
       } else {
-        setLoading(true)
-        const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo)
+        setLoading(true);
+        const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
         const request = {
           user_id: authData.id,
-          ...(
-             type !== 'start' ?
-             { e_lat_lon: `${lat},${long}`}
-             :
-             { s_lat_lon: `${lat},${long}`}
-          )
+          ...(type !== 'start' ? { e_lat_lon: `${lat},${long}` } : { s_lat_lon: `${lat},${long}` }),
         };
         const URL = type !== 'start' ? END_DAY : START_DAY;
-        const { data, message } = await Post(URL, request) as ApiResponse;
+        const { data, message } = (await Post(URL, request)) as ApiResponse;
 
         if (data.status) {
           setLoading(false);
@@ -80,27 +77,11 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const onNext = async (flag: string, lat: string, long: string): Promise<void> => {
-
-    Alert.alert(
-      'Start your day',
-      'Are you wnat to start your day ?',
-      [
-        {
-          text: 'No',
-          onPress: () => console.log("No pressed"),
-          // style: 'cancle',
-        },
-        {
-          text: 'Yes',
-          onPress: () => startDay(flag, lat, long)
-        } 
-      ],
-      { cancelable: true }
-    )
-  }
+  const onNext = async (): Promise<void> => {
+    setModalVisible(true);
+  };
 
   // For Animated Image Circle
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -124,14 +105,9 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   const openDrawer = () => navigation.openDrawer();
   // console.log("day");
 
-
   return (
     <View style={c.flex1}>
-      <Header
-        hide={type !== 'start'}
-        onPress={openDrawer}
-        title={Strings.dayStatus}
-      />
+      <Header hide={type !== 'start'} onPress={openDrawer} title={Strings.dayStatus} />
       <ImageBackground source={ImageView.dayBg} style={styles.dayBgImageStyle}>
         <View style={c.h100} />
         <View style={styles.middleTimeSection}>
@@ -169,18 +145,16 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
           <T style={styles.lowerText}>
             <Text
-              title={
-                type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg
-              }
+              title={type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg}
               style={c.textRegular14White}
             />
           </T>
 
           <Button
             top={40}
-            loading={loading}
+            // loading={loading}
             onPress={() => {
-              onNext('', lat, long)
+              onNext();
             }}
             textColor={Colors.white}
             style={styles.buttonStylePayment}
@@ -190,6 +164,17 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
           />
         </View>
       </ImageBackground>
+
+      <ConfirmationModal
+        visible={modalVisible}
+        onYes={() => {
+          setModalVisible(true);
+          startDay('', lat, long);
+        }}
+        onNo={() => setModalVisible(false)}
+        message='Are you want to start your day ?'
+        loading={loading}
+      />
     </View>
   );
 };

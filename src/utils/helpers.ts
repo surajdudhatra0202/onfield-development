@@ -183,44 +183,14 @@ export function deleteDBData() {
 
 
 export const isLogout = () => {
-  Alert.alert(
-    "Confirm Logout",
-    "Are you sure ?",
-    [
+  deleteDBData();
+  navigationRef.reset({
+    index: 0,
+    routes: [
       {
-        text: "No",
-        onPress: () => console.log('No Pressed'),
-        style: 'cancel',
+        name: Routes.Login,
+        params: { status: 'start' },
       },
-      {
-        text: "Yes",
-        onPress: () => {
-          deleteDBData();
-          navigationRef.reset({
-            index: 0,
-            routes: [
-              {
-                name: Routes.Login,
-                params: { status: 'start' },
-              },
-            ],
-          });
-        }
-      }
     ],
-    { cancelable: true }
-  )
+  });
 };
-
-// export const isLogout = () => {
-//   deleteDBData();
-//   navigationRef.reset({
-//     index: 0,
-//     routes: [
-//       {
-//         name: Routes.Login,
-//         params: { status: 'start' },
-//       },
-//     ],
-//   });
-// };

@@ -13,9 +13,11 @@ import { styles } from './styles';
 import Loader from '../Spinner/loader';
 import { Post } from '@/services';
 import { ApiResponse, AuthData } from '@/types/global';
+import ConfirmationModal from '../Modal/confirmationModal';
 
 interface menuActionProps {
   nav: string;
+  name: string;
 }
 
 const ListHeaderComponent = () => {
@@ -28,14 +30,15 @@ const CustomDrawer = (props) => {
   const [loading, setLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
   const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
+  const [modalVisible, setModalVisible] = useState(false)
 
-  console.log('props', props);
-  console.log('drawerlist', ...getLoginDetails().drawerMenu);
+  // console.log('props', props);
+  // console.log('drawerlist', ...getLoginDetails().drawerMenu);
   
 
   const menuAction = (item: menuActionProps, index: number) => {
-    console.log(Strings.endMyDay);
-    console.log(item.nav);
+    // console.log(Strings.endMyDay);
+    console.log( 'item props' ,item.nav);
     
     if (item.nav === 'delete') {
       Alert.alert(
@@ -55,21 +58,15 @@ const CustomDrawer = (props) => {
         { cancelable: true },
       );
     }
-    // else if (item.nav === Strings.endMyDay) {
-    //   props.navigation.navigate(Routes.DayStatus, { data: item });
-    //   console.log(Routes.DayStatus, {data : item})
-
-    else if (item.nav === "DayStatus") {
+    else if (item.name === Strings.endMyDay) {
+      setModalVisible(true)
       props.navigation.navigate(Routes.DayStatus, { data: item });
-      console.log('find status', props.navigation.navigate);
-      console.log('routes status', Routes.DayStatus, {data : item})
-
+      console.log(Routes.DayStatus, {data : item})
     } else if (item.nav === Strings.logout) {
-      isLogout();
+      // isLogout();
+      setModalVisible(true)
     } else {
       props.navigation.navigate(item.nav);
-      // console.log('navi', props.navigation.navigate);
-      // console.log('routes', Routes.DayStatus, {data : item})
     }
     setActiveMenu(index);
   };
@@ -154,7 +151,7 @@ const CustomDrawer = (props) => {
 
       {ListHeaderComponent()}
 
-      <TouchableOpacity onPress={isLogout} style={styles.listHeader}>
+      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.listHeader}>
         <View style={c.flexRow}>
           <Image resizeMode="contain" source={ImageView.profile} style={c.img70} />
           <Text title="Rahul" style={c.textBoldWhite} />
@@ -162,6 +159,7 @@ const CustomDrawer = (props) => {
         <Image resizeMode="contain" source={ImageView.logout} style={c.img30} />
       </TouchableOpacity>
 
+      <ConfirmationModal visible={modalVisible} onYes={() => {setModalVisible(true); isLogout();}} onNo={() => setModalVisible(false)} message='Are you want to logout ?'  />
       <Loader visible={loading} />
     </View>
   );
