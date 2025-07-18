@@ -30,16 +30,16 @@ const CustomDrawer = (props) => {
   const [loading, setLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
   const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentAction, setCurrentAction] = useState('');
 
   // console.log('props', props);
   // console.log('drawerlist', ...getLoginDetails().drawerMenu);
-  
 
   const menuAction = (item: menuActionProps, index: number) => {
     // console.log(Strings.endMyDay);
-    console.log( 'item props' ,item.nav);
-    
+    console.log('item props', item.nav);
+
     if (item.nav === 'delete') {
       Alert.alert(
         'Delete Account',
@@ -57,14 +57,15 @@ const CustomDrawer = (props) => {
         ],
         { cancelable: true },
       );
-    }
-    else if (item.name === Strings.endMyDay) {
-      setModalVisible(true)
-      props.navigation.navigate(Routes.DayStatus, { data: item });
-      console.log(Routes.DayStatus, {data : item})
+    } else if (item.name === Strings.endMyDay) {
+      setCurrentAction('Clock Out');
+      setModalVisible(true);
+      // props.navigation.navigate(Routes.DayStatus, { data: item });
+      console.log(Routes.DayStatus, { data: item });
     } else if (item.nav === Strings.logout) {
       // isLogout();
-      setModalVisible(true)
+      setCurrentAction('logout');
+      setModalVisible(true);
     } else {
       props.navigation.navigate(item.nav);
     }
@@ -90,6 +91,19 @@ const CustomDrawer = (props) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const varifyAction = () => {
+    setModalVisible(true);
+
+    if (currentAction === 'logout') {
+      isLogout();
+    } else if (currentAction === 'Clock Out') {
+      props.navigation.navigate(Routes.DayStatus, { data: { name: Strings.endMyDay } });
+    }
+
+    setModalVisible(false);
+    setCurrentAction('')
   };
 
   const renderItem = ({ item, index }) => {
@@ -151,7 +165,13 @@ const CustomDrawer = (props) => {
 
       {ListHeaderComponent()}
 
-      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.listHeader}>
+      <TouchableOpacity
+        onPress={() => {
+          setCurrentAction('logout');
+          setModalVisible(true);
+        }}
+        style={styles.listHeader}
+      >
         <View style={c.flexRow}>
           <Image resizeMode="contain" source={ImageView.profile} style={c.img70} />
           <Text title="Rahul" style={c.textBoldWhite} />
@@ -159,7 +179,13 @@ const CustomDrawer = (props) => {
         <Image resizeMode="contain" source={ImageView.logout} style={c.img30} />
       </TouchableOpacity>
 
-      <ConfirmationModal visible={modalVisible} onYes={() => {setModalVisible(true); isLogout();}} onNo={() => setModalVisible(false)} message='Are you want to logout ?'  />
+      <ConfirmationModal
+        visible={modalVisible}
+        onYes={varifyAction}
+        onNo={() => {setModalVisible(false), setCurrentAction('')}}
+        message={ currentAction === 'logout' ? "Are you want to logout ?" : "Are you want end your day ?"}
+      />
+      {/* <ConfirmationModal visible={modalVisible} onYes={() => {setModalVisible(true); isLogout();}} onNo={() => setModalVisible(false)} message='Are you want to logout ?'  /> */}
       <Loader visible={loading} />
     </View>
   );
