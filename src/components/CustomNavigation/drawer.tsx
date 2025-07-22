@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import c from '@style';
-import { DELETE, getLoginDetails, isLogout, LOGIN, PrefManager, showPopupMessage } from '@utils';
+import {
+  DELETE,
+  END_DAY,
+  getLocation,
+  getLoginDetails,
+  isLogout,
+  LOGIN,
+  PrefManager,
+  showPopupMessage,
+} from '@utils';
 import { Colors, Fonts, ImageView, StorageKey, Strings } from '@constants';
 import type { ImageStyle } from 'react-native';
 import { Alert, FlatList, Image, TouchableOpacity, View } from 'react-native';
@@ -38,7 +47,7 @@ const CustomDrawer = (props) => {
 
   const menuAction = (item: menuActionProps, index: number) => {
     // console.log(Strings.endMyDay);
-    console.log('item props', item.nav);
+    // console.log('item props', item.nav);
 
     if (item.nav === 'delete') {
       Alert.alert(
@@ -58,14 +67,15 @@ const CustomDrawer = (props) => {
         { cancelable: true },
       );
     } else if (item.name === Strings.endMyDay) {
-      setCurrentAction('Clock Out');
       setModalVisible(true);
+      setCurrentAction('Clock Out');
       // props.navigation.navigate(Routes.DayStatus, { data: item });
-      console.log(Routes.DayStatus, { data: item });
+      // console.log(Routes.DayStatus, { data: item });
+      // console.log(props.navigation.navigate(Routes.DayStatus, { data: item }));
     } else if (item.nav === Strings.logout) {
       // isLogout();
-      setCurrentAction('logout');
       setModalVisible(true);
+      setCurrentAction('logout');
     } else {
       props.navigation.navigate(item.nav);
     }
@@ -93,17 +103,55 @@ const CustomDrawer = (props) => {
     }
   };
 
-  const varifyAction = () => {
-    setModalVisible(true);
+  const fetchAndStoreLocation = async () => {
+    const coords = await getLocation();
+
+    if (coords) {
+      const lat = coords.latitude.toString();
+      const long = coords.longitude.toString();
+
+      return { lat, long };
+    } else {
+      console.log('unable to fetch cordinates');
+      return null;
+    }
+  };
+
+  const varifyAction = async () => {
+    setLoading(true);
+
+    const location = await fetchAndStoreLocation();
+
+    if (!location) {
+      setLoading(false);
+      showPopupMessage(Strings.error, 'Failed to fetch location', true);
+      return;
+    }
+
+    const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
+
+    // console.log('auth data ', authData);
+
+    // console.log('location', lat, long);
+
+    const request = {
+      user_id: authData.id,
+      e_lat_lon: `${location.lat},${location.long}`,
+    };
 
     if (currentAction === 'logout') {
       isLogout();
     } else if (currentAction === 'Clock Out') {
       props.navigation.navigate(Routes.DayStatus, { data: { name: Strings.endMyDay } });
+
+      const { data, message } = (await Post(END_DAY, request)) as ApiResponse;
+
+      console.log('clock out', data, END_DAY, request);
     }
 
     setModalVisible(false);
-    setCurrentAction('')
+    setCurrentAction('');
+    setLoading(false);
   };
 
   const renderItem = ({ item, index }) => {
@@ -180,12 +228,16 @@ const CustomDrawer = (props) => {
       </TouchableOpacity>
 
       <ConfirmationModal
+        loading={loading}
         visible={modalVisible}
         onYes={varifyAction}
-        onNo={() => {setModalVisible(false), setCurrentAction('')}}
-        message={ currentAction === 'logout' ? "Are you want to logout ?" : "Are you want end your day ?"}
+        onNo={() => {
+          setModalVisible(false), setCurrentAction('');
+        }}
+        message={
+          currentAction === 'logout' ? 'Are you want to logout ?' : 'Are you want end your day ?'
+        }
       />
-      {/* <ConfirmationModal visible={modalVisible} onYes={() => {setModalVisible(true); isLogout();}} onNo={() => setModalVisible(false)} message='Are you want to logout ?'  /> */}
       <Loader visible={loading} />
     </View>
   );

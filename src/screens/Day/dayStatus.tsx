@@ -1,11 +1,18 @@
-import { View, Text as T, Animated, Easing, ImageBackground, Alert } from 'react-native';
+import { View, Text as T, Animated, Easing, ImageBackground } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Header, Text } from '@components';
 import c from '@style';
 import { Colors, Dimens, ImageView, StorageKey, Strings } from '@constants';
 import styles from './styles';
 import moment from 'moment';
-import { getLocation, showPopupMessage, END_DAY, START_DAY, PrefManager } from '@utils';
+import {
+  getLocation,
+  showPopupMessage,
+  END_DAY,
+  START_DAY,
+  PrefManager,
+  CHECK_STATUS,
+} from '@utils';
 import { Post } from '@services';
 import { NavigationProps } from '@/navigation/navigation';
 import { ApiResponse, AuthData } from '@/types/global';
@@ -20,6 +27,31 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   const [currentTime, setCurrentTime] = useState(cTime);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [startBtnVisible, setStartBtnVisible] = useState(true);
+  const [dayStatus, setDayStatus] = useState();
+
+  const checkUserStatus = async () => {
+    const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
+
+    const request = {
+      user_id: authData.id,
+    };
+
+    const { data, message } = (await Post(CHECK_STATUS, request)) as ApiResponse;
+
+    // console.log('new', data, message);
+    // console.log('action', data.action);
+
+    const checkStatus = data.action;
+
+    // console.log(checkStatus);
+
+    if (checkStatus === 1) {
+      setStartBtnVisible(true);
+    }
+
+    setDayStatus(checkStatus);
+  };
 
   const fetchAndStoreLocation = async (from: string) => {
     const coords = await getLocation();
@@ -45,6 +77,7 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
   useEffect(() => {
     fetchAndStoreLocation('useEffect');
+    checkUserStatus();
   }, []);
 
   const startDay = async (flag: string, lat: string, long: string) => {
@@ -63,6 +96,8 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
           ...(type !== 'start' ? { e_lat_lon: `${lat},${long}` } : { s_lat_lon: `${lat},${long}` }),
         };
         const URL = type !== 'start' ? END_DAY : START_DAY;
+        console.log('url', URL);
+        
         const { data, message } = (await Post(URL, request)) as ApiResponse;
 
         if (data.status) {
@@ -103,7 +138,6 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   });
 
   const openDrawer = () => navigation.openDrawer();
-  // console.log("day");
 
   return (
     <View style={c.flex1}>
@@ -145,34 +179,35 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
           <T style={styles.lowerText}>
             <Text
-              title={type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg}
+              // title={type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg}
+              title={dayStatus === 1 ? Strings.clockInStartedMsg : Strings.dayEndedMsg}
               style={c.textRegular14White}
             />
           </T>
 
-          <Button
-            top={40}
-            // loading={loading}
-            onPress={() => {
-              onNext();
-            }}
-            textColor={Colors.white}
-            style={styles.buttonStylePayment}
-            text={'Start day'}
-            icon={type !== 'start' ? 'power' : 'arrow-right'}
-            bgColor={type !== 'start' ? Colors.primary : Colors.primary}
-          />
+          {startBtnVisible && (
+            <Button
+              top={40}
+              // loading={loading}
+              onPress={onNext}
+              textColor={Colors.white}
+              style={styles.buttonStylePayment}
+              text={'Start day'}
+              icon={type !== 'start' ? 'power' : 'arrow-right'}
+              bgColor={type !== 'start' ? Colors.primary : Colors.primary}
+            />
+          )}
         </View>
       </ImageBackground>
 
       <ConfirmationModal
         visible={modalVisible}
         onYes={() => {
-          setModalVisible(true);
+          setModalVisible(false);
           startDay('', lat, long);
         }}
         onNo={() => setModalVisible(false)}
-        message='Are you want to start your day ?'
+        message="Are you want to start your day ?"
         loading={loading}
       />
     </View>

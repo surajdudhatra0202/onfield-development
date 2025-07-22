@@ -110,6 +110,7 @@
   "bestValue": "Best Value",
   "clockInMsg": "You’re clocked in!",
   "clockInStartedMsg": "Clock in to get started!",
+  "dayEndedMsg" : "Your day is ended !",
   "noDataAvailableMsg": "No Data Available",
   "welcomeTxt": "Welcome!",
   "toGetStartedTxt": "to get started",
