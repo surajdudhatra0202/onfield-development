@@ -27,7 +27,7 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   const [currentTime, setCurrentTime] = useState(cTime);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [startBtnVisible, setStartBtnVisible] = useState(true);
+  const [startBtnVisible, setStartBtnVisible] = useState(false);
   const [dayStatus, setDayStatus] = useState();
 
   const checkUserStatus = async () => {
@@ -46,8 +46,10 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
     // console.log(checkStatus);
 
-    if (checkStatus === 1) {
+    if (checkStatus === 1 || checkStatus === 2) {
       setStartBtnVisible(true);
+    } else {
+      setStartBtnVisible(false);
     }
 
     setDayStatus(checkStatus);
@@ -82,6 +84,11 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
   const startDay = async (flag: string, lat: string, long: string) => {
     try {
+      if (dayStatus === 3) {
+        showPopupMessage(Strings.error, 'Day already ended', true);
+        return;
+      }
+
       if (lat.length === 0 || long.length === 0) {
         setLoading(true);
         if (flag !== 'stop') {
@@ -97,8 +104,10 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
         };
         const URL = type !== 'start' ? END_DAY : START_DAY;
         console.log('url', URL);
-        
+
         const { data, message } = (await Post(URL, request)) as ApiResponse;
+
+        console.log('new data', data);
 
         if (data.status) {
           setLoading(false);
@@ -115,6 +124,17 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   };
 
   const onNext = async (): Promise<void> => {
+    
+    if (dayStatus === 2) {
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      return;
+    }
+
+    if (dayStatus === 3) {
+    showPopupMessage(Strings.noMessages, 'Your day is already ended.', false);
+    return;
+  }
+
     setModalVisible(true);
   };
 
@@ -180,19 +200,25 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
           <T style={styles.lowerText}>
             <Text
               // title={type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg}
-              title={dayStatus === 1 ? Strings.clockInStartedMsg : Strings.dayEndedMsg}
+              title={
+                dayStatus === 1
+                  ? Strings.clockInStartedMsg
+                  : dayStatus === 2
+                    ? Strings.clockInMsg
+                    : Strings.dayEndedMsg
+              }
               style={c.textRegular14White}
             />
           </T>
 
-          {startBtnVisible && (
+          {startBtnVisible && (dayStatus === 1 || dayStatus === 2) && (
             <Button
               top={40}
               // loading={loading}
               onPress={onNext}
               textColor={Colors.white}
               style={styles.buttonStylePayment}
-              text={'Start day'}
+              text={dayStatus === 1 ? 'Start day' : 'Go to Home Page'}
               icon={type !== 'start' ? 'power' : 'arrow-right'}
               bgColor={type !== 'start' ? Colors.primary : Colors.primary}
             />
