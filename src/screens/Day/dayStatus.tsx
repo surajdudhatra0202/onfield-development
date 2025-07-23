@@ -17,6 +17,7 @@ import { Post } from '@services';
 import { NavigationProps } from '@/navigation/navigation';
 import { ApiResponse, AuthData } from '@/types/global';
 import ConfirmationModal from '@/components/Modal/confirmationModal';
+import { DotIndicator } from 'react-native-indicators';
 
 const cTime = moment(new Date()).format('hh:mm');
 
@@ -78,8 +79,12 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   }, []);
 
   useEffect(() => {
-    fetchAndStoreLocation('useEffect');
-    checkUserStatus();
+    (async () => {
+      setLoading(true);
+      await fetchAndStoreLocation('useEffect');
+      await checkUserStatus();
+      setLoading(false);
+    })();
   }, []);
 
   const startDay = async (flag: string, lat: string, long: string) => {
@@ -124,16 +129,15 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   };
 
   const onNext = async (): Promise<void> => {
-    
     if (dayStatus === 2) {
       navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
       return;
     }
 
     if (dayStatus === 3) {
-    showPopupMessage(Strings.noMessages, 'Your day is already ended.', false);
-    return;
-  }
+      showPopupMessage(Strings.noMessages, 'Your day is already ended.', false);
+      return;
+    }
 
     setModalVisible(true);
   };
@@ -197,31 +201,37 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
           <View style={c.h100} />
 
-          <T style={styles.lowerText}>
-            <Text
-              // title={type !== 'start' ? Strings.clockInStartedMsg : Strings.clockInMsg}
-              title={
-                dayStatus === 1
-                  ? Strings.clockInStartedMsg
-                  : dayStatus === 2
-                    ? Strings.clockInMsg
-                    : Strings.dayEndedMsg
-              }
-              style={c.textRegular14White}
-            />
-          </T>
+          {loading ? (
+            <View>
+              <DotIndicator color={Colors.lightWhite} size={8} />
+            </View>
+          ) : (
+            <>
+              <T style={styles.lowerText}>
+                <Text
+                  title={
+                    dayStatus === 1
+                      ? Strings.clockInStartedMsg
+                      : dayStatus === 2
+                        ? Strings.clockInMsg
+                        : Strings.dayEndedMsg
+                  }
+                  style={c.textRegular14White}
+                />
+              </T>
 
-          {startBtnVisible && (dayStatus === 1 || dayStatus === 2) && (
-            <Button
-              top={40}
-              // loading={loading}
-              onPress={onNext}
-              textColor={Colors.white}
-              style={styles.buttonStylePayment}
-              text={dayStatus === 1 ? 'Start day' : 'Go to Home Page'}
-              icon={type !== 'start' ? 'power' : 'arrow-right'}
-              bgColor={type !== 'start' ? Colors.primary : Colors.primary}
-            />
+              {startBtnVisible && (dayStatus === 1 || dayStatus === 2) && (
+                <Button
+                  top={40}
+                  onPress={onNext}
+                  textColor={Colors.white}
+                  style={styles.buttonStylePayment}
+                  text={dayStatus === 1 ? 'Start day' : 'Go to Home Page'}
+                  icon={type !== 'start' ? 'power' : 'arrow-right'}
+                  bgColor={type !== 'start' ? Colors.primary : Colors.primary}
+                />
+              )}
+            </>
           )}
         </View>
       </ImageBackground>
