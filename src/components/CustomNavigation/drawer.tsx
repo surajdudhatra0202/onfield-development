@@ -111,7 +111,7 @@ const CustomDrawer = (props) => {
       const long = coords.longitude.toString();
 
       return { lat, long };
-    } else {
+    } else {  
       console.log('unable to fetch cordinates');
       return null;
     }

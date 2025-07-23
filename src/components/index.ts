@@ -27,6 +27,8 @@ import ImageGrid from './Image/ImageGrid';
 // Utilities
 import DateTimePicker from './DateTimePicker';
 
+import GlobalLocationGuard from './LocationGuard/GlobalLocationGuard';
+
 export {
   // Layout
   AppRoot,
@@ -55,4 +57,6 @@ export {
 
   // Utilities
   DateTimePicker,
+
+  GlobalLocationGuard,
 };

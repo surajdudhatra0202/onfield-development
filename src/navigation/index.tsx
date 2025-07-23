@@ -7,9 +7,9 @@ import c from '@style';
 import { FontScalableComponent } from '@/types/global';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { GlobalLocationGuard } from '@/components';
 
 export default function App(): React.ReactElement {
-  
   const disableFontScaling = <T extends FontScalableComponent>(component: T): void => {
     if (!component.defaultProps) {
       component.defaultProps = {};
@@ -29,7 +29,9 @@ export default function App(): React.ReactElement {
         <SafeAreaView style={c.flex1P}>
           <BottomSheetModalProvider>
             <View style={c.flex1W}>
-              <NavigatorStack />
+              <GlobalLocationGuard>
+                <NavigatorStack />
+              </GlobalLocationGuard>
             </View>
           </BottomSheetModalProvider>
         </SafeAreaView>
