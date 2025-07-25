@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import c from '@style';
 import {
+  CALLS,
   DELETE,
   END_DAY,
   getLocation,
@@ -39,11 +40,34 @@ const CustomDrawer = (props) => {
   const [loading, setLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
   const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentAction, setCurrentAction] = useState('');
+  // const [callData, setCallData] = useState<number>();
 
   // console.log('props', props);
   // console.log('drawerlist', ...getLoginDetails().drawerMenu);
+
+  const getCallDetail = async (authData: AuthData) => {
+    try {
+      const requestCallDetails = {
+        user_id: authData.id,
+        type: 1,
+        page: 1,
+      };
+
+      const { data } = (await Post(CALLS, requestCallDetails)) as ApiResponse;
+      // console.log('calls', data?.data?.calls?.length);
+
+      const callCount = data?.data?.calls?.length;
+      // console.log('trqww', callCount);
+      // setCallData(callCount);
+
+      return callCount;
+    } catch (error) {
+      console.error('Err to fetch call details ');
+      return showPopupMessage(Strings.error, String(error), true);
+    }
+  };
 
   const menuAction = (item: menuActionProps, index: number) => {
     // console.log(Strings.endMyDay);
@@ -111,7 +135,7 @@ const CustomDrawer = (props) => {
       const long = coords.longitude.toString();
 
       return { lat, long };
-    } else {  
+    } else {
       console.log('unable to fetch cordinates');
       return null;
     }
@@ -130,10 +154,6 @@ const CustomDrawer = (props) => {
 
     const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
 
-    // console.log('auth data ', authData);
-
-    // console.log('location', lat, long);
-
     const request = {
       user_id: authData.id,
       e_lat_lon: `${location.lat},${location.long}`,
@@ -142,11 +162,19 @@ const CustomDrawer = (props) => {
     if (currentAction === 'logout') {
       isLogout();
     } else if (currentAction === 'Clock Out') {
-      props.navigation.navigate(Routes.DayStatus, { data: { name: Strings.endMyDay } });
+      const callCount = await getCallDetail(authData);
 
-      const { data, message } = (await Post(END_DAY, request)) as ApiResponse;
+      if (callCount > 0) {
+        console.log('call not completed');
+        showPopupMessage(Strings.callIncomplete, callCount);
+        props.navigation.navigate(Routes.Home);
+      } else {
+        props.navigation.navigate(Routes.DayStatus, { data: { name: Strings.endMyDay } });
 
-      console.log('clock out', data, END_DAY, request);
+        const { data, message } = (await Post(END_DAY, request)) as ApiResponse;
+
+        console.log('clock out', data, END_DAY, request);
+      }
     }
 
     setModalVisible(false);

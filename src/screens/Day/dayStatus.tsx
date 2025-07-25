@@ -27,9 +27,9 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
   const [long, setLong] = useState('');
   const [currentTime, setCurrentTime] = useState(cTime);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [startBtnVisible, setStartBtnVisible] = useState(false);
-  const [dayStatus, setDayStatus] = useState();
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [startBtnVisible, setStartBtnVisible] = useState<boolean>(false);
+  const [dayStatus, setDayStatus] = useState<number>();
 
   const checkUserStatus = async () => {
     const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);

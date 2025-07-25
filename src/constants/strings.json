@@ -80,6 +80,7 @@
   "customerTxt": "Customer",
   "categoryTxt": "Category",
   "totalNoOfDayTxt": "Total no. of Days",
+  "callIncomplete": "You have incomplete calls :",
 
   "error": "Error",
   "googleLoginFailed": "Google login failed. Please try again later.",
