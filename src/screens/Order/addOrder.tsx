@@ -12,13 +12,15 @@ import LinearGradient from 'react-native-linear-gradient';
 import { AuthData } from '@/types/global';
 import { CATEGORIES, ITEMS, PrefManager, SAVE_ORDER, showPopupMessage } from '@/utils';
 import { Post } from '@/services';
+import ConfirmationModal from '@/components/Modal/confirmationModal';
 
 const TextView = (key: string, value: string) => {
   return (
     <View style={c.flexRow}>
       <Text title={key} width={'20%'} style={c.textRegularGray} />
       <Text title={':  '} style={c.textRegularGray} />
-      <Text title={value} color={Colors.primary} style={c.textBold} />{/* flex 1  */}
+      <Text title={value} color={Colors.primary} style={c.textBold} />
+      {/* flex 1  */}
     </View>
   );
 };
@@ -29,22 +31,27 @@ const AddOrder = ({ navigation }: NavigationProps) => {
   const [itemData, setItemData] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const MAX_QUANTITY = 10;
+
+  // console.log(itemData[1]);
 
   useEffect(() => {
     getCallAndItemDetails('useEffect');
   }, []);
 
   const getCallAndItemDetails = async (from: string, id?: number) => {
+    setLoading(true);
     try {
       const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
-      setCustomerName(authData?.name ?? '')
+      setCustomerName(authData?.name ?? '');
 
       const request = {
         user_id: authData.id,
         ...(from == 'dropdown' && {
-          "category": id,
-          "page": 1
-        })
+          category: id,
+          page: 1,
+        }),
       };
 
       const API_URL = from == 'useEffect' ? CATEGORIES : ITEMS;
@@ -54,7 +61,7 @@ const AddOrder = ({ navigation }: NavigationProps) => {
         if (from === 'useEffect') {
           setCategoryData(data?.data ?? []);
         } else if (from === 'dropdown') {
-          setItemData(data?.data ?? [])
+          setItemData(data?.data ?? []);
         }
       } else {
         showPopupMessage(Strings.error, data?.message ?? message, true);
@@ -64,6 +71,8 @@ const AddOrder = ({ navigation }: NavigationProps) => {
     } finally {
       setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const onCustomerChange = (item) => {
@@ -72,22 +81,22 @@ const AddOrder = ({ navigation }: NavigationProps) => {
   };
 
   const onNext = async () => {
-    setLoading(true)
-    const items = itemData.map(e => {
-      return { item_id: e.id, qty: e.qty }
-    })
+    setLoading(true);
+    const items = itemData.map((e) => {
+      return { item_id: e.id, qty: e.qty };
+    });
 
     try {
       const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
       const request = {
         user_id: authData.id,
         category: category.id,
-        items: items
+        items: items,
       };
       const { data, message } = await Post(SAVE_ORDER, request);
 
       if (data.status) {
-        goBack()
+        goBack();
       } else {
         showPopupMessage(Strings.error, data?.message ?? message, true);
       }
@@ -96,29 +105,46 @@ const AddOrder = ({ navigation }: NavigationProps) => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const onIncrease = (index: number) => {
-    itemData[index].qty += 1
-    setItemData([...itemData])
-  }
+    if (itemData[index].qty < MAX_QUANTITY) {
+      itemData[index].qty += 1;
+      setItemData([...itemData]);
+    } else {
+      showPopupMessage(Strings.error, 'You reached max item limit', true);
+    }
+  };
 
   const onDecrease = (index: number) => {
     if (itemData[index].qty == 1) {
-      itemData[index].qty = 1
+      itemData[index].qty = 1;
     } else {
-      itemData[index].qty -= 1
+      itemData[index].qty -= 1;
     }
-    setItemData([...itemData])
+    setItemData([...itemData]);
   };
 
   const handleInputChange = (text: string, index: number) => {
-    let newQty = parseInt(text || "1")
+    const updatedItems = [...itemData];
+
+    if (text == '') {
+      updatedItems[index].qty = '';
+      setItemData(updatedItems);
+      return;
+    }
+
+    let newQty = parseInt(text, 10);
     if (isNaN(newQty) || newQty < 1) {
       newQty = 1;
     }
-    itemData[index].qty = newQty
-    setItemData([...itemData])
+    if (newQty > MAX_QUANTITY) {
+      showPopupMessage(Strings.error, `You can add maximum ${MAX_QUANTITY} items`, true);
+      newQty = MAX_QUANTITY;
+    }
+
+    updatedItems[index].qty = newQty;
+    setItemData(updatedItems);
   };
 
   const renderItem = ({ item, index }) => {
@@ -128,8 +154,8 @@ const AddOrder = ({ navigation }: NavigationProps) => {
         locations={[0.198, 0.9645]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.48, y: 1 }}
-
-        style={styles.listStyle}>
+        style={styles.listStyle}
+      >
         <View style={c.width100}>
           <View>
             {TextView('Name', item.name)}
@@ -143,8 +169,8 @@ const AddOrder = ({ navigation }: NavigationProps) => {
             <TextInput
               style={styles.input}
               keyboardType="numeric"
-              textAlign='center'
-              value={item.qty.toString()}
+              textAlign="center"
+              value={item.qty.toString() ?? ''}
               maxLength={3}
               onChangeText={(text) => handleInputChange(text, index)}
             />
@@ -194,7 +220,7 @@ const AddOrder = ({ navigation }: NavigationProps) => {
             value={category?.name || ''}
             onChange={onCustomerChange}
             renderLeftIcon={() => (
-              <Icon style={c.marginRight5} color={Colors.primary} name="account-group" size={20} />
+              <Icon style={c.marginRight12} color={Colors.primary} name="account-group" size={20} />
             )}
           />
         </View>
@@ -214,13 +240,25 @@ const AddOrder = ({ navigation }: NavigationProps) => {
           <Button
             text={Strings.saveText}
             bottom={8}
-            onPress={onNext}
+            onPress={() => {
+              setModalVisible(true);
+            }}
             loading={loading}
             icon={'arrow-right-thick'}
             style={c.buttonStyle}
           />
         )}
       </View>
+
+      <ConfirmationModal
+        loading={loading}
+        visible={modalVisible}
+        onYes={onNext}
+        onNo={() => {
+          setModalVisible(false);
+        }}
+        message={'Are you want save order ?'}
+      />
     </View>
   );
 };

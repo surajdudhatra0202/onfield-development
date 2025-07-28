@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   listStyle: {
      ...c.viewStyle,
      width: '99%',
+     padding: 8
   },
   listView:{
     borderRadius:18,
