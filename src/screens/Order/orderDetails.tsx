@@ -1,13 +1,14 @@
 import { ScrollView, View } from 'react-native';
 import React, { ReactNode, useEffect, useState, useCallback } from 'react';
-import { Seperator, Text, InfoRow, Loader, Header } from '@components';
+import { Seperator, Text, InfoRow, Loader, Header, Button } from '@components';
 import c from '@style';
 import styles from '../Home/styles';
-import { StorageKey, Strings } from '@constants';
+import { Constants, StorageKey, Strings } from '@constants';
 import { Post } from '@services';
 import { showPopupMessage, PrefManager, ORDER_DETAILS } from '@utils';
 import { NavigationProps } from '@/navigation/navigation';
 import { AuthData } from '@/types/global';
+import PdfView from '../Shared/Pdf';
 
 type CallInfo = Record<string, unknown>;
 
@@ -25,6 +26,9 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
 
   const [callInfo, setCallInfo] = useState<CallInfo>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [viewPdf, setViewPdf] = useState<boolean>(false);
+
+  const src = Constants.PANEL_URL + 'master-order/order-pdf/dFJEYjNFalVpRnozcTArWVNXc1N2Zz09';
 
   useEffect(() => {
     getCallDetails();
@@ -35,7 +39,7 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
       const authData: AuthData = await PrefManager.getValue(StorageKey.userInfo);
       const request = {
         user_id: authData.id,
-        order_id: orderInfo.id
+        order_id: orderInfo.id,
       };
       const { data, message } = await Post(ORDER_DETAILS, request);
       if (data.status) {
@@ -50,31 +54,34 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
     }
   };
 
-  const renderInfoRowGroup = useCallback((data: string[], groupKey: string) => (
-    data.map((row, i) => {
-      return (
-        <React.Fragment key={`${groupKey}-${i}`}>
-          {Object.entries(row).map(([key, value], j) => (
-            <React.Fragment key={`${groupKey}-${i}-${j}`}>
-              <InfoRow title={key} value={value ?? Strings.na} />
-              <Seperator padding={2} borderHeight={-1} />
-            </React.Fragment>
-          ))}
-          {i < data.length - 1 && <Seperator style={styles.seperatorStyle} borderHeight={0} />}
-        </React.Fragment>
-      )
-    })
-  ), []);
+  const pdfviewer = () => {
+    setViewPdf(true);
+  };
+
+  const renderInfoRowGroup = useCallback(
+    (data: string[], groupKey: string) =>
+      data.map((row, i) => {
+        return (
+          <React.Fragment key={`${groupKey}-${i}`}>
+            {Object.entries(row).map(([key, value], j) => (
+              <React.Fragment key={`${groupKey}-${i}-${j}`}>
+                <InfoRow title={key} value={value ?? Strings.na} />
+                <Seperator padding={2} borderHeight={-1} />
+              </React.Fragment>
+            ))}
+            {i < data.length - 1 && <Seperator style={styles.seperatorStyle} borderHeight={0} />}
+          </React.Fragment>
+        );
+      }),
+    [],
+  );
 
   const goBack = () => navigation.goBack();
-  const headerName = `Order-${orderInfo?.order_no ?? '-'}`
+  const headerName = `Order-${orderInfo?.order_no ?? '-'}`;
 
   return (
     <View style={c.flex1W}>
-      <Header
-        isBack
-        onPress={goBack}
-        title={headerName} />
+      <Header isBack onPress={goBack} title={headerName} />
 
       <ScrollView style={c.flex1WHorizontal}>
         {Object.entries(callInfo).length === 0 && !loading ? (
@@ -92,7 +99,13 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
         )}
 
         <View style={c.h26} />
+        <Button style={c.buttonSaveStyle} loading={loading} text="View PDF" onPress={pdfviewer} />
       </ScrollView>
+
+      {viewPdf && (
+        <PdfView visible={viewPdf} onClose={() => setViewPdf(false)} params={orderInfo} src={src} />
+      )}
+
       <Loader visible={loading} />
     </View>
   );

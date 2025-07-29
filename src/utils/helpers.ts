@@ -1,6 +1,6 @@
 import { showMessage } from 'react-native-flash-message';
 import { Colors, StorageKey, Strings } from '@constants';
-import { Alert, Platform, StatusBar } from 'react-native';
+import { Alert, PermissionsAndroid, Platform, StatusBar } from 'react-native';
 import type { GeoCoordinates, GeoPosition } from 'react-native-geolocation-service';
 import Geolocation from 'react-native-geolocation-service';
 import { realm } from '../database';
@@ -193,4 +193,44 @@ export const isLogout = () => {
       },
     ],
   });
+};
+
+
+
+
+
+export const requestStoragePermission = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return true;
+
+  try {
+    if (Platform.Version >= 33) {
+      const result = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+      ]);
+      // return (
+      //   result['android.permission.READ_MEDIA_IMAGES'] === PermissionsAndroid.RESULTS.GRANTED ||
+      //   result['android.permission.READ_MEDIA_VIDEO'] === PermissionsAndroid.RESULTS.GRANTED
+      // );
+    } else if (Platform.Version >= 29) {
+      // Android 10 and 11 – DownloadManager doesn't need WRITE_EXTERNAL_STORAGE
+      return true;
+    } else {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to your storage to download files.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+  } catch (err) {
+    console.warn('Permission error', err);
+    return false;
+  }
 };

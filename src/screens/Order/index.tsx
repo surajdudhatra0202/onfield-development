@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Header, ListItem } from '@components';
+import { Button, Header, ListItem } from '@components';
 import c from '@style';
 import { Strings } from '@constants';
 import { Routes } from '../../navigation/route';

@@ -12,6 +12,7 @@ const constants = {
   API_BASE_URL: 'https://manage.onfieldai.com/api/v1/',
   API_BASE_URL_LOCAL: 'https://work.infilon.net/infilon-service/api/v1/',
   IMAGE_URL: 'https://onfieldai.com/wp-content/uploads/2025/04/',
+  PANEL_URL: 'https://manage.onfieldai.com/',
   SENTRY_INTERNAL_DSN: '',
   REQUEST_TIMEOUT: 20000 * 1,
   config: {

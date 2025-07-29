@@ -4,8 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-
-    
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start --port 8081",
@@ -34,6 +32,7 @@
     "react": "19.0.0",
     "react-native": "0.78.2",
     "react-native-app-intro-slider": "^4.0.4",
+    "react-native-blob-util": "^0.22.2",
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-collapsible": "^1.6.2",
     "react-native-device-info": "^14.0.4",
@@ -49,6 +48,7 @@
     "react-native-mmkv": "^3.3.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-pager-view": "^6.8.1",
+    "react-native-pdf": "^6.7.7",
     "react-native-permissions": "^5.4.1",
     "react-native-razorpay": "^2.3.0",
     "react-native-reanimated": "^3.18.0",
