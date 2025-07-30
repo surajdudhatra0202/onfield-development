@@ -73,6 +73,17 @@ const c = StyleSheet.create({
     justifyContent: 'center',
     width: '90%',
   },
+
+  pdfButtonStyle: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: Colors.accent,
+    borderRadius: 28,
+    // height: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 5
+    // width: '90%',
+  },
   colorWhite: {
     backgroundColor: Colors.white
   },

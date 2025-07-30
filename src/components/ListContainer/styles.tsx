@@ -2,6 +2,13 @@ import { StyleSheet } from 'react-native';
 import { Fonts, Dimens, Colors } from '@constants';
 
 const styles = StyleSheet.create({
+  downloadIcon:{
+    position: 'absolute',
+    right: 20,
+    top: '25%',
+    padding: 15,
+    zIndex: 10,
+  },
   cardMain: {
     alignItems: 'flex-start',
     flexDirection: 'column',

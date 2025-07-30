@@ -28,7 +28,7 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [viewPdf, setViewPdf] = useState<boolean>(false);
 
-  const src = Constants.PANEL_URL + 'master-order/order-pdf/dFJEYjNFalVpRnozcTArWVNXc1N2Zz09';
+  const src = orderInfo.pdf;
 
   useEffect(() => {
     getCallDetails();

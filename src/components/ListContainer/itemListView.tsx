@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { TouchableOpacity, View, Image, Text as T, ViewStyle } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Text from '../Text';
@@ -6,7 +6,9 @@ import styles from './styles';
 import { Colors, ImageView, Strings } from '@constants';
 import c from '@style';
 import moment from 'moment';
-import { InfoRow } from '@components';
+import { Button, InfoRow } from '@components';
+import PdfView from '@/screens/Shared/Pdf';
+import Feather from 'react-native-vector-icons/Feather';
 
 type Status = 'Pending' | 'Approved' | 'Rejected' | 'High' | 'Medium' | 'Low';
 
@@ -19,6 +21,7 @@ interface ItemListViewProps {
   status?: Status;
   reason?: string;
   leaveDate?: string;
+  pdfBtn?: () => void;
 }
 
 const ItemListView: React.FC<ItemListViewProps> = ({
@@ -30,6 +33,7 @@ const ItemListView: React.FC<ItemListViewProps> = ({
   status,
   reason,
   leaveDate,
+  pdfBtn
 }) => {
 
   const getStatusImage = (status: Status) => {
@@ -61,37 +65,40 @@ const ItemListView: React.FC<ItemListViewProps> = ({
   const labelArr = label?.split('|') ?? [];
   const valueArr = value?.split('|') ?? [];
 
-  const circleInnerStyle: ViewStyle = useMemo(() => ({
-    height: 45,
-    width: 45,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: statusColor,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
-  }), [statusColor]);
+  const circleInnerStyle: ViewStyle = useMemo(
+    () => ({
+      height: 45,
+      width: 45,
+      borderRadius: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: statusColor,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.15,
+      shadowRadius: 3.84,
+    }),
+    [statusColor],
+  );
 
   return (
-
     <LinearGradient
       colors={[Colors.white, '#e1e9ff4d']}
       start={{ x: 0, y: 0.3 }}
       end={{ x: 0, y: 1 }}
-      style={c.viewStyle}>
+      style={c.viewStyle}
+    >
+      {/* <View style={styles.listMain} > */}
       <TouchableOpacity onPress={onPress} style={c.viewRootLisStyle} activeOpacity={0.8}>
-
-        {status &&
+        {status && (
           <View style={circleInnerStyle}>
             <Image resizeMode={'contain'} source={statusImage} style={c.img30} />
           </View>
-        }
+        )}
 
         <View style={styles.cardMain}>
           {srNo && (
@@ -125,6 +132,12 @@ const ItemListView: React.FC<ItemListViewProps> = ({
 
         <Image source={ImageView.listShape} style={styles.imagebg} resizeMode="contain" />
       </TouchableOpacity>
+
+      {pdfBtn && (
+        <TouchableOpacity style={styles.downloadIcon} onPress={pdfBtn}>
+          <Feather name="download" size={25} color={Colors.accent} />
+        </TouchableOpacity>
+      )}
     </LinearGradient>
 
   );

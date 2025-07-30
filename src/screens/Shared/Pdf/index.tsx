@@ -1,5 +1,5 @@
 import { ModalView } from '@/components';
-import { Colors, Strings } from '@/constants';
+import { Colors, Constants, Strings } from '@/constants';
 import c from '@/style';
 import React, { useState } from 'react';
 import { Platform, TouchableOpacity, View } from 'react-native';
@@ -20,13 +20,17 @@ interface PdfViewProps {
 const PdfView: React.FC<PdfViewProps> = ({ visible, onClose, params, src }) => {
   const [loading, setLoading] = useState<boolean>(false);
 
+  const URL = Constants.PANEL_URL + src;
+
   const pdfSrc = {
-    uri: src,
+    uri: URL,
   };
 
-  const pdfName = 'ODR' + params.order_no;
+  console.log('paramssssss', pdfSrc);
 
-  // console.log(params);
+  const pdfName = 'ODR_' + params?.order_no;
+
+  console.log(pdfName, params, 'pdfname');
 
   const downloadPdf = async () => {
     if (Platform.OS === 'android') {
@@ -58,12 +62,13 @@ const PdfView: React.FC<PdfViewProps> = ({ visible, onClose, params, src }) => {
         path: filePath,
       },
     })
-      .fetch('GET', src)
+      .fetch('GET', URL)
       .then((res) => {
         console.log('The filed saved to', res.path());
       })
       .catch((error) => {
         console.error('Download err');
+        console.error('📛 Full error object:', error);
         showPopupMessage(Strings.error, 'Download error', true);
       });
   };
