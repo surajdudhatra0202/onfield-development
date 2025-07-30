@@ -26,11 +26,11 @@ const PdfView: React.FC<PdfViewProps> = ({ visible, onClose, params, src }) => {
     uri: URL,
   };
 
-  console.log('paramssssss', pdfSrc);
+  // console.log('paramssssss', pdfSrc);
 
   const pdfName = 'ODR_' + params?.order_no;
 
-  console.log(pdfName, params, 'pdfname');
+  // console.log(pdfName, params, 'pdfname');
 
   const downloadPdf = async () => {
     if (Platform.OS === 'android') {
@@ -47,7 +47,7 @@ const PdfView: React.FC<PdfViewProps> = ({ visible, onClose, params, src }) => {
 
     const downloadDir = Platform.select({
       ios: '/storage/emulated/0/Download',
-      android: dirs.DownloadDir,
+      android: '/storage/emulated/0/Download',
     });
 
     const filePath = `${downloadDir}/${pdfName}.pdf`;

@@ -43,7 +43,7 @@ const Order = ({ navigation }: NavigationProps) => {
     setViewPdf(true);
   };
 
-  console.log('selected order', selectedOrder);
+  // console.log('selected order', selectedOrder);
   
   const renderItem = ({ item, tab }) => (
     <View>
