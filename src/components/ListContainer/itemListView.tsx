@@ -8,7 +8,7 @@ import c from '@style';
 import moment from 'moment';
 import { Button, InfoRow } from '@components';
 import PdfView from '@/screens/Shared/Pdf';
-import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Status = 'Pending' | 'Approved' | 'Rejected' | 'High' | 'Medium' | 'Low';
 
@@ -135,7 +135,7 @@ const ItemListView: React.FC<ItemListViewProps> = ({
 
       {pdfBtn && (
         <TouchableOpacity style={styles.downloadIcon} onPress={pdfBtn}>
-          <Feather name="download" size={25} color={Colors.accent} />
+          <FontAwesome5 name="file-pdf" size={26} color={Colors.primary} />
         </TouchableOpacity>
       )}
     </LinearGradient>
