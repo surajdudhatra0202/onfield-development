@@ -122,6 +122,7 @@ const NavigatorStack = (): React.ReactElement => {
         <RootStack.Screen name={Routes.OrderDetails} component={RouteScreens[Routes.OrderDetails]} />
         <RootStack.Screen name={Routes.DayStatus} component={RouteScreens[Routes.DayStatus]} />
         <RootStack.Screen name={Routes.RequestLeave} component={RouteScreens[Routes.RequestLeave]} />
+        <RootStack.Screen name={Routes.CallTransfer} component={RouteScreens[Routes.CallTransfer]} />
       </RootStack.Navigator>
       <FlashMessage position="top" />
 

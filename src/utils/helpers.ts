@@ -20,10 +20,7 @@ export function emptyValidator(str: string, fieldName: string = 'This field'): s
   return !_str ? `${fieldName} can't be empty` : '';
 }
 
-
-
-
-/** 
+/**
  * Validates email format
  * @param {string} email The email to check
  * @returns {string} Returns an error string if invalid, otherwise an empty string
@@ -32,9 +29,6 @@ export function emailValidator(email: string): string {
   const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/;
   return reg.test(email.trim()) ? '' : Strings.validMail;
 }
-
-
-
 
 /**
  * Checks if a value is considered "empty".
@@ -49,7 +43,7 @@ export function emailValidator(email: string): string {
  * @returns `true` if the value is empty, otherwise `false`
  */
 export function isEmptyValue(
-  value: string | number | null | undefined | object | unknown[]
+  value: string | number | null | undefined | object | unknown[],
 ): boolean {
   if (value == null) return true; // null or undefined
   if (typeof value === 'string') return value.trim() === '';
@@ -58,20 +52,22 @@ export function isEmptyValue(
   return false; // numbers and other primitives are not "empty"
 }
 
-
-
-
 /** Shows a popup banner message (top of screen)
  * @param {string}        message     The message title
  * @param {string|null}   description The description of the message
  * @param {boolean}       error       Whether the message is an error
  * @returns {void}
  */
-export function showPopupMessage(message: string, description: string, error = false): void {
+export function  showPopupMessage(
+  message: string,
+  description: string,
+  error = false,
+  backgroundColor?: string,
+): void {
   showMessage({
     message,
     description,
-    backgroundColor: !error ? Colors.primary : Colors.red,
+    backgroundColor: backgroundColor ?? (!error ? Colors.primary : Colors.red),
     color: Colors.white,
     type: 'default',
     floating: true,
@@ -79,10 +75,6 @@ export function showPopupMessage(message: string, description: string, error = f
     duration: error ? 8000 : 6000,
   });
 }
-
-
-
-
 
 export async function getLocation(): Promise<GeoCoordinates | null> {
   try {
@@ -138,12 +130,9 @@ export async function getLocation(): Promise<GeoCoordinates | null> {
   }
 }
 
-
-
-
 export const storeAuthData = (data: LoginResponse) => {
   try {
-    PrefManager.setValue(StorageKey.userInfo, data.data)
+    PrefManager.setValue(StorageKey.userInfo, data.data);
 
     realm.write(() => {
       // Clear old DrawerMenu if needed
@@ -160,27 +149,19 @@ export const storeAuthData = (data: LoginResponse) => {
   }
 };
 
-
-
-
-
 export function getLoginDetails() {
   const drawerMenu = realm.objects('DrawerMenu');
   return {
     drawerMenu,
   };
-};
-
-
-
+}
 
 export function deleteDBData() {
-  PrefManager.deleteItem(StorageKey.userInfo)
+  PrefManager.deleteItem(StorageKey.userInfo);
   realm.write(() => {
     realm.deleteAll();
   });
 }
-
 
 export const isLogout = () => {
   deleteDBData();
@@ -203,34 +184,38 @@ export const requestStoragePermission = async (): Promise<boolean> => {
   if (Platform.OS !== 'android') return true;
 
   try {
-    if (Platform.Version >= 33) {
-      const result = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
-      ]);
-      // return (
-      //   result['android.permission.READ_MEDIA_IMAGES'] === PermissionsAndroid.RESULTS.GRANTED ||
-      //   result['android.permission.READ_MEDIA_VIDEO'] === PermissionsAndroid.RESULTS.GRANTED
-      // );
-    } else if (Platform.Version >= 29) {
-      // Android 10 and 11 – DownloadManager doesn't need WRITE_EXTERNAL_STORAGE
+    const androidVersion = Platform.Version;
+    
+    if (androidVersion >= 33) {
+      // Android 13+ - No storage permission needed for downloads
       return true;
+    } else if (androidVersion >= 30) {
+      // Android 11-12 - Request READ_EXTERNAL_STORAGE
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission Required',
+          message: 'This app needs storage permission to download PDF files.',
+          buttonPositive: 'Allow',
+          buttonNegative: 'Deny',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
     } else {
+      // Android 10 and below - Request WRITE_EXTERNAL_STORAGE
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         {
-          title: 'Storage Permission',
-          message: 'App needs access to your storage to download files.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
+          title: 'Storage Permission Required',
+          message: 'This app needs storage permission to download PDF files.',
+          buttonPositive: 'Allow',
+          buttonNegative: 'Deny',
         },
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     }
   } catch (err) {
-    console.warn('Permission error', err);
-    return false;
+    console.warn('Permission error:', err);
+    return Platform.Version >= 33; // Return true for Android 13+ even on error
   }
 };

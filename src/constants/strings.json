@@ -117,5 +117,9 @@
   "toGetStartedTxt": "to get started",
   "signatureTxt": "Signature",
   "toCompleteProcessMsg": "To complete the process Please Add Your Signature and Picture of the Work",
-  "selectItemTxt": "Select item"
+  "selectItemTxt": "Select item",
+
+  "callTransfer": "Next Date",
+  "pendingCalls": "Pending Calls",
+  "callTransferDate": "Call transfer to the: "
 }

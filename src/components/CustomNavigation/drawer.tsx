@@ -24,6 +24,7 @@ import Loader from '../Spinner/loader';
 import { Post } from '@/services';
 import { ApiResponse, AuthData } from '@/types/global';
 import ConfirmationModal from '../Modal/confirmationModal';
+import CallTransfer from '@/screens/Call/callTransfer';
 
 interface menuActionProps {
   nav: string;
@@ -42,10 +43,7 @@ const CustomDrawer = (props) => {
   const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentAction, setCurrentAction] = useState('');
-  // const [callData, setCallData] = useState<number>();
-
-  // console.log('props', props);
-  // console.log('drawerlist', ...getLoginDetails().drawerMenu);
+  const [callData, setCallData] = useState(null);
 
   const getCallDetail = async (authData: AuthData) => {
     try {
@@ -56,11 +54,8 @@ const CustomDrawer = (props) => {
       };
 
       const { data } = (await Post(CALLS, requestCallDetails)) as ApiResponse;
-      // console.log('calls', data?.data?.calls?.length);
-
       const callCount = data?.data?.calls?.length;
-      // console.log('trqww', callCount);
-      // setCallData(callCount);
+      setCallData(data);
 
       return callCount;
     } catch (error) {
@@ -70,9 +65,6 @@ const CustomDrawer = (props) => {
   };
 
   const menuAction = (item: menuActionProps, index: number) => {
-    // console.log(Strings.endMyDay);
-    // console.log('item props', item.nav);
-
     if (item.nav === 'delete') {
       Alert.alert(
         'Delete Account',
@@ -93,11 +85,7 @@ const CustomDrawer = (props) => {
     } else if (item.name === Strings.endMyDay) {
       setModalVisible(true);
       setCurrentAction('Clock Out');
-      // props.navigation.navigate(Routes.DayStatus, { data: item });
-      // console.log(Routes.DayStatus, { data: item });
-      // console.log(props.navigation.navigate(Routes.DayStatus, { data: item }));
     } else if (item.nav === Strings.logout) {
-      // isLogout();
       setModalVisible(true);
       setCurrentAction('logout');
     } else {
@@ -141,6 +129,10 @@ const CustomDrawer = (props) => {
     }
   };
 
+  const callTransferPopup = () => {
+    props.navigation.navigate(Routes.CallTransfer, { callData: callData }); 
+  };
+
   const varifyAction = async () => {
     setLoading(true);
 
@@ -161,25 +153,39 @@ const CustomDrawer = (props) => {
 
     if (currentAction === 'logout') {
       isLogout();
+      setModalVisible(false);
+      setCurrentAction('');
+      setLoading(false);
     } else if (currentAction === 'Clock Out') {
       const callCount = await getCallDetail(authData);
 
       if (callCount > 0) {
-        console.log('call not completed');
-        showPopupMessage(Strings.callIncomplete, callCount);
+        showPopupMessage(Strings.callIncomplete, callCount, Colors.accent);
+        setCurrentAction('call transfer');
+        setModalVisible(true);
+        setLoading(false);
+
         props.navigation.navigate(Routes.Home);
+
+        // setTimeout(() => {
+        //   callTransferPopup();
+        // }, 100);
+
+        return;
       } else {
         props.navigation.navigate(Routes.DayStatus, { data: { name: Strings.endMyDay } });
 
         const { data, message } = (await Post(END_DAY, request)) as ApiResponse;
-
-        console.log('clock out', data, END_DAY, request);
+        setModalVisible(false);
+        setCurrentAction('');
+        setLoading(false);
       }
+    } else if (currentAction === 'call transfer') {
+      setModalVisible(false);
+      setCurrentAction('');
+      callTransferPopup()
+      setLoading(false);
     }
-
-    setModalVisible(false);
-    setCurrentAction('');
-    setLoading(false);
   };
 
   const renderItem = ({ item, index }) => {
@@ -263,7 +269,11 @@ const CustomDrawer = (props) => {
           setModalVisible(false), setCurrentAction('');
         }}
         message={
-          currentAction === 'logout' ? 'Are you want to logout ?' : 'Are you want end your day ?'
+          currentAction === 'logout'
+            ? 'Are you want to logout ?'
+            : currentAction === 'Clock Out'
+              ? 'Are you want end your day ?'
+              : 'Are you want to transfer call to another day ?'
         }
       />
       <Loader visible={loading} />

@@ -26,51 +26,45 @@ const PdfView: React.FC<PdfViewProps> = ({ visible, onClose, params, src }) => {
     uri: URL,
   };
 
-  // console.log('paramssssss', pdfSrc);
-
   const pdfName = 'ODR_' + params?.order_no;
 
-  // console.log(pdfName, params, 'pdfname');
-
   const downloadPdf = async () => {
-    if (Platform.OS === 'android') {
-      const hasPermission = await requestStoragePermission();
-      if (!hasPermission) {
-        console.log('Storage permission denied');
-        showPopupMessage(Strings.error, 'Storage permission denied', true);
-        return;
+    try {
+      setLoading(true);
+
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          showPopupMessage(Strings.error, 'Storage permission denied', true);
+          setLoading(false);
+          return;
+        }
       }
+
+      const fileName = `${pdfName}.pdf`;
+      const downloadPath = `/storage/emulated/0/Download/${fileName}`;
+
+      const response = await ReactNativeBlobUtil.config({
+        fileCache: true,
+        addAndroidDownloads: {
+          useDownloadManager: true,
+          notification: true,
+          title: fileName,
+          description: 'Downloading PDF file',
+          mime: 'application/pdf',
+          mediaScannable: true,
+          path: downloadPath,
+        },
+      }).fetch('GET', URL);
+
+      console.log('Download completed:', response.path());
+      showPopupMessage(Strings.success, 'PDF downloaded successfully!', false);
+    } catch (error) {
+      console.error('Download error:', error);
+      showPopupMessage(Strings.error, 'Download failed. Please try again.', true);
+    } finally {
+      setLoading(false);
     }
-
-    const { config, fs } = ReactNativeBlobUtil;
-    const dirs = fs.dirs;
-
-    const downloadDir = Platform.select({
-      ios: '/storage/emulated/0/Download',
-      android: '/storage/emulated/0/Download',
-    });
-
-    const filePath = `${downloadDir}/${pdfName}.pdf`;
-
-    config({
-      fileCache: true,
-      addAndroidDownloads: {
-        useDownloadManager: true, // Use Android's native download manager
-        notification: true, // Show download notification
-        mediaScannable: true, // Make the file visible in media galleries
-        title: pdfName,
-        path: filePath,
-      },
-    })
-      .fetch('GET', URL)
-      .then((res) => {
-        console.log('The filed saved to', res.path());
-      })
-      .catch((error) => {
-        console.error('Download err');
-        console.error('📛 Full error object:', error);
-        showPopupMessage(Strings.error, 'Download error', true);
-      });
   };
 
   return (
