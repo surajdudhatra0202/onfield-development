@@ -41,6 +41,10 @@
   "yourSignature": "Your Signature",
   "generateText": "Generate",
 
+  "sales": "Sales",
+  "addCompany": "Add Company",
+  "callHistory": "Call History",
+
   "addCallBtnText": "Add Call",
   "checkInStartCall": "Check-in to Start call",
   "saveText": "Save",

@@ -25,6 +25,8 @@ import AddNewCallScreen from '../screens/Call';
 import ViewItemsScreen from '../screens/ViewItem';
 
 import CallTransferScreen from '../screens/Call/callTransfer';
+import SalesScreen from '../screens/Sales'
+import AddCompanyScreen from '../screens/Sales/companyForm'
 
 import UpdateSignatureScreen from '../screens/Signature/updateSignature';
 
@@ -54,7 +56,9 @@ export enum Routes {
   ViewItems = 'ViewItems',
   UpdateSignature = 'UpdateSignature',
 
-  CallTransfer = 'CallTransfer'
+  CallTransfer = 'CallTransfer',
+  Sales = 'Sales',
+  AddCompany = 'AddCompany'
 }
 
 export const RouteScreens = {
@@ -82,6 +86,8 @@ export const RouteScreens = {
   [Routes.UpdateSignature]: UpdateSignatureScreen,
 
   [Routes.CallTransfer]: CallTransferScreen,
+  [Routes.Sales]: SalesScreen,
+  [Routes.AddCompany]: AddCompanyScreen
 };
 
 export type ViewItemData = {
@@ -117,4 +123,6 @@ export type RootStackParamList = {
   [Routes.UpdateSignature]: { from: string },
 
   [Routes.CallTransfer]: {callData?: any},
+  [Routes.Sales]: undefined,
+  [Routes.AddCompany]: undefined,
 };

@@ -82,6 +82,12 @@ const NavigatorStack = (): React.ReactElement => {
         />
 
         <Drawer.Screen
+          name={Routes.Sales}
+          component={RouteScreens[Routes.Sales]}
+          options={createDrawerScreenOptions(Strings.sales, ImageView.back)}
+        />
+
+        <Drawer.Screen
           name={Routes.ViewItems}
           component={RouteScreens[Routes.ViewItems]}
           options={createDrawerScreenOptions(Strings.viewItem, ImageView.back)}
@@ -123,6 +129,8 @@ const NavigatorStack = (): React.ReactElement => {
         <RootStack.Screen name={Routes.DayStatus} component={RouteScreens[Routes.DayStatus]} />
         <RootStack.Screen name={Routes.RequestLeave} component={RouteScreens[Routes.RequestLeave]} />
         <RootStack.Screen name={Routes.CallTransfer} component={RouteScreens[Routes.CallTransfer]} />
+        <RootStack.Screen name={Routes.Sales} component={RouteScreens[Routes.Sales]} />
+        <RootStack.Screen name={Routes.AddCompany} component={RouteScreens[Routes.AddCompany]} />
       </RootStack.Navigator>
       <FlashMessage position="top" />
 

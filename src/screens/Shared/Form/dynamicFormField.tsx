@@ -8,6 +8,7 @@ import { FieldData } from '@/types/global';
 import styles from '../../Home/styles';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import c from '@/style';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 type Props = {
   item: FieldData;
@@ -15,6 +16,7 @@ type Props = {
   onChange: (type: FieldData['type'], index: number, value: string, idx?: number, side?: 'left' | 'right') => void;
   setActiveDateIndex?: (index: number) => void;
   setActiveDateTimeIndex?: (index: number) => void;
+  callHistory?: () => void;
 };
 
 const DynamicFormField = ({
@@ -23,6 +25,7 @@ const DynamicFormField = ({
   onChange,
   setActiveDateIndex,
   setActiveDateTimeIndex,
+  callHistory,
 }: Props) => {
   switch (item.type) {
     case 'number':
@@ -101,20 +104,28 @@ const DynamicFormField = ({
       return (
         <View style={c.marginV12}>
           <Text style={c.textTitleStyle} title={item.label} />
-          <TouchableOpacity
-            style={(datePickerStyle(item?.error ?? false))}
-            onPress={() => {
-              if (item.type === 'datetime') {
-                setActiveDateTimeIndex(index)
-              } else {
-                setActiveDateIndex(index);
-              }
-            }}>
-            <Text
-              style={c.textRegular}
-              title={formattedTitle}
-            />
-          </TouchableOpacity>
+          <View style={c.flexRow}>
+            <View style={{flex: 1}}>
+              <TouchableOpacity
+                style={datePickerStyle(item?.error ?? false)}
+                onPress={() => {
+                  if (item.type === 'datetime') {
+                    setActiveDateTimeIndex(index);
+                  } else {
+                    setActiveDateIndex(index);
+                  }
+                }}
+              >
+                <Text style={c.textRegular} title={formattedTitle} />
+              </TouchableOpacity>
+            </View>
+
+            {item.name === 'call_date' && (
+              <TouchableOpacity style={{ marginLeft: 5 }} onPress={callHistory}>
+                <MaterialIcons name="history" size={28} color={Colors.primary} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       );
 

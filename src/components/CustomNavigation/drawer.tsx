@@ -24,7 +24,6 @@ import Loader from '../Spinner/loader';
 import { Post } from '@/services';
 import { ApiResponse, AuthData } from '@/types/global';
 import ConfirmationModal from '../Modal/confirmationModal';
-import CallTransfer from '@/screens/Call/callTransfer';
 
 interface menuActionProps {
   nav: string;
@@ -36,14 +35,15 @@ const ListHeaderComponent = () => {
 };
 
 const deleteAccount = { name: 'Delete My Account', nav: 'delete', icon: 'delete' };
+const sales = { name: 'Sales', nav: 'Sales', icon: 'sale' }; // for temporary
 
 const CustomDrawer = (props) => {
   const [loading, setLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
-  const drawerList = [...getLoginDetails().drawerMenu, deleteAccount];
+  const drawerList = [...getLoginDetails().drawerMenu, deleteAccount, sales];
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentAction, setCurrentAction] = useState('');
-  const [callData, setCallData] = useState(null);
+  const [callData, setCallData] = useState(null);  
 
   const getCallDetail = async (authData: AuthData) => {
     try {
