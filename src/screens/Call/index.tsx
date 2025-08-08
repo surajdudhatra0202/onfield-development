@@ -185,6 +185,7 @@ const AddNewCall = ({ navigation }: NavigationProps) => {
           isVisible
           mode={activeDateIndex !== -1 ? 'date' : 'datetime'}
           minimumDate={new Date()}
+          date={callFormData[activeDateIndex]?.value ? new Date(callFormData[activeDateIndex].value) : new Date()}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

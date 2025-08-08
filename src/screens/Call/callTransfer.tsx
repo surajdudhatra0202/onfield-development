@@ -109,6 +109,7 @@ const CallTransfer: React.FC<Props> = ({ navigation, route }: NavigationProps) =
             isVisible
             mode="date"
             minimumDate={new Date()}
+            date={selectedDate ? new Date(selectedDate) : new Date()}
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />

@@ -232,6 +232,7 @@ const Sales = ({ navigation }: NavigationProps) => {
           isVisible
           mode="date"
           minimumDate={new Date()}
+          date={ callFormData[activeDateIndex]?.value ? new Date(callFormData[activeDateIndex].value) : new Date() }
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

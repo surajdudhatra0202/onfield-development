@@ -202,6 +202,15 @@ const CallDetails = ({ navigation, route }: NavigationProps) => {
           isVisible
           mode={activeDateIndex !== -1 ? 'date' : 'datetime'}
           minimumDate={new Date()}
+          date={
+            activeDateIndex !== -1
+              ? fieldsData[activeDateIndex]?.value
+                ? new Date(fieldsData[activeDateIndex].value)
+                : new Date()
+              : fieldsData[activeDateTimeIndex]?.value
+                ? new Date(fieldsData[activeDateTimeIndex].value)
+                : new Date()
+          }
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

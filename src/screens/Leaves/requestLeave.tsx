@@ -167,6 +167,15 @@ const RequestLeave = ({ navigation }: NavigationProps) => {
           isVisible={dateVisible1 || dateVisible2}
           mode="date"
           minimumDate={fromDate ? new Date(fromDate) : new Date()}
+          date={
+            dateVisible1
+              ? fromDate
+                ? new Date(fromDate)
+                : new Date()
+              : toDate
+                ? new Date(toDate)
+                : new Date()
+          }
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

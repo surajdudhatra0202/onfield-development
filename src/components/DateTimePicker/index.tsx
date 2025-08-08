@@ -6,6 +6,7 @@ type DateTimePickerProps = {
   mode: 'datetime' | 'date' | undefined;
   minimumDate?: Date;
   maximumDate?: Date;
+  date?: Date;
   onConfirm?: () => void;
   onCancel?: () => void;
 };
@@ -15,6 +16,7 @@ const DateTimePicker = ({
   mode,
   minimumDate,
   maximumDate,
+  date,
   onConfirm,
   onCancel,
 }: DateTimePickerProps) => {
@@ -24,6 +26,7 @@ const DateTimePicker = ({
       mode={mode}
       minimumDate={minimumDate}
       maximumDate={maximumDate}
+      date={date}
       onConfirm={onConfirm}
       onCancel={onCancel}
       locale="en_GB"
