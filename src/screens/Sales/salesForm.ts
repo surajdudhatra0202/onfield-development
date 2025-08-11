@@ -18,7 +18,7 @@ const salesForm: FieldData[] = [
     ],
   },
   {
-    required: 1,
+    required: 0,
     name: 'call_details',
     label: 'Other Purpose of Visit',
     type: 'textarea',
@@ -30,7 +30,11 @@ const salesForm: FieldData[] = [
     label: 'Contact Person',
     type: 'dropdown',
     value: '',
-    options: ['Person 1', 'Sales User', 'User 2'],
+    options: [
+      { "id": 1, "name": 'Person 1' },
+      { "id": 2, "name": 'User' },
+      { "id": 1, "name": 'Sales Person' },
+    ],
   },
   {
     required: 1,

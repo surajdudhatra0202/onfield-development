@@ -36,39 +36,42 @@ const CompanyForm = ({ navigation }: NavigationProps) => {
     return valid;
   };
 
-  const onNext = () => {
-    if (!validateForm()) {
-      showPopupMessage(Strings.error, Strings.error, true);
-      return;
-    }
-
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
+  const onNext = async () => {
+    try {
+      setLoading(true);
 
       const newCompany = {
-        id: Date.now(), // temp ID
         name: formFields.find((f) => f.name === 'name')?.value,
+        email: formFields.find((f) => f.name === 'email')?.value,
+        contact_person: formFields.find((f) => f.name === 'contact_person')?.value,
         address: formFields.find((f) => f.name === 'address')?.value,
-        city: formFields.find((f) => f.name === 'city')?.value,
+        phone: formFields.find((f) => f.name === 'phone')?.value,
+        mobile: formFields.find((f) => f.name === 'mobile')?.value,
       };
+
+      console.log('new company', newCompany);
 
       const clearData = formFields.map((field) => ({
         ...field,
         value: '',
         error: false,
       }));
+
       setFormFields(clearData);
 
+      showPopupMessage(Strings.success, 'From api', false);
+      
       goBack();
-    }, 800);
+    } catch (e) {
+      showPopupMessage(Strings.error, String(e), true);
+    } finally {
+      setLoading(false);
+    }
 
-    const renderdata = formFields.map((d) => ({
-      value: d.value,
-    }));
-
-    console.log(renderdata);
+    if (!validateForm()) {
+      showPopupMessage(Strings.error, Strings.emptyFieldErr, true);
+      return;
+    }
   };
 
   const renderItem = useCallback(
@@ -121,7 +124,7 @@ const companyFormFields: FieldData[] = [
     name: 'name',
     label: 'Company name',
     type: 'text',
-    value: undefined,
+    value: '',
   },
   {
     required: 1,
@@ -132,7 +135,7 @@ const companyFormFields: FieldData[] = [
   },
   {
     required: 1,
-    name: 'contactPerson',
+    name: 'contact_person',
     label: 'Contact Person',
     type: 'text',
     value: '',

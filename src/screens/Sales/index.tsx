@@ -6,7 +6,7 @@ import React, { useCallback, useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import DynamicFormField from '../Shared/Form/dynamicFormField';
 import { DateTimePicker } from '@/components';
-import { Colors, StorageKey, Strings } from '@/constants';
+import { Colors, Constants, StorageKey, Strings } from '@/constants';
 import { CALLFORM, CUSTOMERS_DETAIL, PrefManager, showPopupMessage } from '@/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { Routes } from '@/navigation/route';
@@ -16,6 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import salesForm from './salesForm';
 import CallHistory from './callHistory';
+import moment from 'moment';
 
 const Sales = ({ navigation }: NavigationProps) => {
   const [introLoad, setIntroLoad] = useState<boolean>(false);
@@ -25,6 +26,7 @@ const Sales = ({ navigation }: NavigationProps) => {
   const [customerDtl, setCustomerDtl] = useState<FieldData[]>([]);
   const [customerName, setCustomerName] = useState();
   const [viewCallHistory, setViewCallHistory] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navTonext = () => navigation.navigate(Routes.AddCompany);
 
@@ -32,16 +34,20 @@ const Sales = ({ navigation }: NavigationProps) => {
     setViewCallHistory(true);
   };
 
+  const clearForm = useCallback(() => {
+    setCallFormData([]);
+    setSelectedDetails('');
+    setCustomerDtl([]);
+    setCustomerName(undefined);
+    setActiveDateIndex(-1);
+
+    getCompanyDetails('useEffect');
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      setCallFormData([]);
-      setSelectedDetails('');
-      setCustomerDtl([]);
-      setCustomerName(undefined);
-      setActiveDateIndex(-1);
-
-      getCompanyDetails('useEffect');
-    }, []),
+      clearForm();
+    }, [clearForm]),
   );
 
   useFocusEffect(
@@ -78,7 +84,6 @@ const Sales = ({ navigation }: NavigationProps) => {
           );
 
           setCustomerName(findCustomer);
-          // setCallFormData(salesForm);
           setCallFormData(salesForm.map((field) => ({ ...field, value: '', error: false })));
         } else {
           onSetFormInfo(data?.data);
@@ -87,7 +92,8 @@ const Sales = ({ navigation }: NavigationProps) => {
         showPopupMessage(Strings.error, data?.message ?? message, true);
       }
     } catch (e) {
-      showPopupMessage(Strings.error, String(e), true);
+      const errorMsg = typeof e === 'string' ? e : e?.message || JSON.stringify(e);
+      showPopupMessage(Strings.error, errorMsg, true);
     } finally {
       setIntroLoad(false);
     }
@@ -148,9 +154,75 @@ const Sales = ({ navigation }: NavigationProps) => {
 
   const openDrawer = () => navigation.openDrawer();
 
-  const onNext = () => {
-    console.log('Form Data:', customerName, callFormData);
+  const onNext = async () => {
+    try {
+      setLoading(true);
+
+      const selectedCustomer = customerName?.options?.find(
+        (opt: any) => opt.id === customerName?.value,
+      );
+
+      if (!selectedCustomer?.id) {
+        showPopupMessage(Strings.error, 'Please select a customer', true);
+        return;
+      }
+
+      let obj: Record<string, any> = {};
+
+      for (let i = 0; i < callFormData.length; i++) {
+      const field = callFormData[i];
+      let value = field.value;
+
+      if (field.type === 'date' && value) {
+        const formatted = moment(value);
+        value = formatted.isValid()
+          ? formatted.format(Constants.dateFormat['DATE_FORMAT'])
+          : value;
+      }
+
+      if(field.name === "contact_person" && value){
+        const selectedContact = field?.options?.find(
+          (options: any) => options.name === value
+        );
+
+        value = selectedContact? selectedContact.id : value
+      }
+
+      if (field.required === 1 && (!value || (typeof value === 'string' && !value?.trim()))) {
+        callFormData[i].error = true;
+        setCallFormData([...callFormData]);
+        showPopupMessage(Strings.error, `${field.label} can't be empty`, true);
+        return;
+      }
+
+      obj[field.name] = value;
+    }
+
+      const payload = {
+        customer_id: selectedCustomer?.id ?? null,
+        ...obj,
+      };
+
+      // console.log('payload', payload);
+      clearForm();
+
+      showPopupMessage(Strings.success, 'From an api', false);
+
+    } catch (e) {
+      showPopupMessage(Strings.error, String(e), true);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // const dropdownData = useMemo(
+  //   () =>
+  //     MockData.map((c, i) => ({
+  //       label: c.company,
+  //       value: i + 1,
+  //     })),
+  //   [],
+  // );
 
   return (
     <View style={c.flex1P}>
@@ -178,6 +250,8 @@ const Sales = ({ navigation }: NavigationProps) => {
                   getCompanyDetails('dropdown', item.value); // fetch customer details using selected ID
                 }}
                 style={styles.dropDownStyle}
+                search
+                searchPlaceholder="Search here..."
               />
             )}
 
@@ -219,7 +293,6 @@ const Sales = ({ navigation }: NavigationProps) => {
           <Button
             text={Strings.saveText}
             bottom={8}
-            // loading={loading}
             onPress={onNext}
             icon={'arrow-right-thick'}
             style={c.buttonStyle}
@@ -232,7 +305,11 @@ const Sales = ({ navigation }: NavigationProps) => {
           isVisible
           mode="date"
           minimumDate={new Date()}
-          date={ callFormData[activeDateIndex]?.value ? new Date(callFormData[activeDateIndex].value) : new Date() }
+          date={
+            callFormData[activeDateIndex]?.value
+              ? new Date(callFormData[activeDateIndex].value)
+              : new Date()
+          }
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

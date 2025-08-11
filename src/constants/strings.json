@@ -44,6 +44,7 @@
   "sales": "Sales",
   "addCompany": "Add Company",
   "callHistory": "Call History",
+  "emptyFieldErr": "Please fill all required fields",
 
   "addCallBtnText": "Add Call",
   "checkInStartCall": "Check-in to Start call",
