@@ -62,7 +62,7 @@ const Order = ({ navigation }: NavigationProps) => {
     <View style={c.flex1W}>
       <Header onPress={openDrawer} onAdd={navToNext} title={Strings.titleOrderList} />
 
-      <TabListScreen renderItem={renderItem} tabScreens={tabScreens} enableUseFocusEffect={true} />
+      <TabListScreen renderItem={renderItem} tabScreens={tabScreens} />
 
       <PdfView
         visible={viewPdf}
