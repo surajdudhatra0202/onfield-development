@@ -4,6 +4,8 @@ import { styles } from './styles';
 import { Colors, ImageView } from '@constants';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Text from '../Text';
+import { Routes } from '@/navigation/route';
+import { navigate } from '@/navigation/navigationHelper';
 
 interface HeaderProps {
   onPress?: () => void;
@@ -12,9 +14,13 @@ interface HeaderProps {
   onAdd?: () => void;
   hide?: boolean;
   image?: boolean;
+  notification?: boolean
 }
 
-const Header: React.FC<HeaderProps> = ({ image, hide, onPress, title, isBack, onAdd }) => {
+const Header: React.FC<HeaderProps> = ({ image, hide, onPress, title, isBack, onAdd, notification }) => {
+  
+  const navToNotification = () => navigate(Routes.Notification)
+  
   return (
     <View style={styles.headerStyle}>
       <View style={styles.headerInnerStyle}>
@@ -35,11 +41,19 @@ const Header: React.FC<HeaderProps> = ({ image, hide, onPress, title, isBack, on
         )}
       </View>
 
-      {onAdd && (
-        <TouchableOpacity onPress={onAdd} style={styles.iconRightStyle}>
-          <Icon name={'add-circle-outline'} size={25} color={Colors.white} />
-        </TouchableOpacity>
-      )}
+      <View style={{ flexDirection: 'row', gap: '10' }}>
+        {onAdd && (
+          <TouchableOpacity onPress={onAdd} style={styles.iconRightStyle}>
+            <Icon name={'add-circle-outline'} size={25} color={Colors.white} />
+          </TouchableOpacity>
+        )}
+
+        {!notification && (
+          <TouchableOpacity onPress={navToNotification} style={{ top: 2 }}>
+            <Icon color={Colors.white} name="notifications-outline" size={22} />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };

@@ -7,7 +7,6 @@ import { Colors, ImageView, Strings } from '@constants';
 import c from '@style';
 import moment from 'moment';
 import { Button, InfoRow } from '@components';
-import PdfView from '@/screens/Shared/Pdf';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Status = 'Pending' | 'Approved' | 'Rejected' | 'High' | 'Medium' | 'Low';
@@ -22,6 +21,8 @@ interface ItemListViewProps {
   reason?: string;
   leaveDate?: string;
   pdfBtn?: () => void;
+  notification?: string;
+  notification_time?: string;
 }
 
 const ItemListView: React.FC<ItemListViewProps> = ({
@@ -33,7 +34,9 @@ const ItemListView: React.FC<ItemListViewProps> = ({
   status,
   reason,
   leaveDate,
-  pdfBtn
+  pdfBtn,
+  notification,
+  notification_time
 }) => {
 
   const getStatusImage = (status: Status) => {
@@ -115,6 +118,13 @@ const ItemListView: React.FC<ItemListViewProps> = ({
             {labelArr.map((e, index) => (
               <InfoRow key={`${e}-${index}`} title={e} value={valueArr[index] ?? ''} />
             ))}
+
+            {notification && (
+              <View style={styles.innerCardSection}>
+                <Text title={notification} color={Colors.drawerColor} style={c.textBold14} />
+                <Text title={notification_time} color={Colors.medium_light_gray} style={c.setupTextStyle} />
+              </View>
+            )}
 
             {date && <InfoRow title={Strings.dateTxt} value={moment(date).format('DD/MM/YYYY')} />}
             {reason && (

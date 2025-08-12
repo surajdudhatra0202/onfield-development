@@ -24,6 +24,8 @@ import AddOrderScreen from '../screens/Order/addOrder';
 import AddNewCallScreen from '../screens/Call';
 import ViewItemsScreen from '../screens/ViewItem';
 
+import NotificationScreen from '../screens/Notification'
+
 import CallTransferScreen from '../screens/Call/callTransfer';
 import SalesScreen from '../screens/Sales'
 import AddCompanyScreen from '../screens/Sales/companyForm'
@@ -87,7 +89,9 @@ export const RouteScreens = {
 
   [Routes.CallTransfer]: CallTransferScreen,
   [Routes.Sales]: SalesScreen,
-  [Routes.AddCompany]: AddCompanyScreen
+  [Routes.AddCompany]: AddCompanyScreen,
+
+  [Routes.Notification]: NotificationScreen
 };
 
 export type ViewItemData = {
