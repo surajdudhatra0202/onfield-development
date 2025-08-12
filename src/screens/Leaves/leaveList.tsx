@@ -20,10 +20,11 @@ d.setDate(d.getDate() - 90);
 const LeaveList = ({ navigation }: NavigationProps) => {
 
   const renderItem = ({ item }: {item : renderItemProps}) => {
+    console.log("LEAVES API item:", item);
     const formattedDate = dayjs(item.leave_date).format(Constants.dateFormat['SHORT_MONTH']);
     return (
       <ListItem
-        status={'Pending'}
+        status={item.status}
         leaveDate={formattedDate}
         reason={item.reason}
       />

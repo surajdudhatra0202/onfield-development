@@ -165,7 +165,7 @@ const EndMyDay = ({ navigation, route }: NavigationProps) => {
 
   return (
     <View style={c.flex1}>
-      <Header hide={type !== 'start'} onPress={openDrawer} title={Strings.dayStatus} />
+      <Header hide={type !== 'start'} onPress={openDrawer} title={Strings.dayStatus} notification />
       <ImageBackground source={ImageView.dayBg} style={styles.dayBgImageStyle}>
         <View style={c.h100} />
         <View style={styles.middleTimeSection}>
