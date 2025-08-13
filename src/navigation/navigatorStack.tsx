@@ -104,6 +104,12 @@ const NavigatorStack = (): React.ReactElement => {
           component={RouteScreens[Routes.UpdateSignature]}
           options={createDrawerScreenOptions(Strings.updateSignature, ImageView.signature)}
         />
+
+        <Drawer.Screen
+          name={Routes.Notification}
+          component={RouteScreens[Routes.Notification]}
+          options={createDrawerScreenOptions(Strings.sales, ImageView.back)}
+        />
       </Drawer.Navigator>
     );
   };
