@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { FlatList, Image, SafeAreaView, StyleProp, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, FlatList, Image, SafeAreaView, StyleProp, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { DotIndicator } from 'react-native-indicators';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ModalView, Text, EmptyComponent } from '@components';
+import { ModalView, Text, EmptyComponent, Loader } from '@components';
 import { Colors, Strings, StorageKey, Fonts, Dimens, ImageView } from '@constants';
 import { Post } from '@services';
 import { CHAT, CHAT_ADD, PrefManager, showPopupMessage } from '@utils';
@@ -30,8 +30,12 @@ const ChatBot = ({ chatEnable, onClose }: ChatBotProps) => {
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    getHistoryChat();
-  }, []);
+    if (chatEnable) {
+      getHistoryChat();
+    } else {
+      setLoading(true);
+    }
+  }, [chatEnable]);
 
   const getHistoryChat = async () => {
     try {
@@ -152,6 +156,8 @@ const ChatBot = ({ chatEnable, onClose }: ChatBotProps) => {
             </View>
 
             <View style={c.triangle} />
+
+            <Loader visible={loading}/>
           </View>
 
           <TouchableOpacity onPress={onClose} style={c.floatingCrossStyle}>
